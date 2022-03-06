@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block content %}
+{% include 'navbar.html' %}
+<center><h1> GIF</h1></center>
+<div style="margin: auto;">
+<div style="text-align: left;">
+<div>
+    <h1>History</h1>
+    {% for object in obj %}
+    <div class="row">
+    <p>{{object.date_time|date:"Y-d-m H:i"}} was looking at:  {{object.search_text}}</p> <br>
+        </div>
+    {% endfor %}
+</div>
+    </div>
+    </div>
+{% if context %}
+<div class="center" style="text-align:center;" >
+    {% for i in context %}
+<img src="{{i.webp}}"  width="150" height="160">
+
+{% endfor %}
+    <br>
+    <br>
+    </div>
+<div class="center2" style="text-align:center;" >
+    <form id="form1" action="{% url 'home' %}" method=GET>
+    {% csrf_token %}
+  <input type="search" id="query1" name="q" placeholder="Search...">
+        <input type="hidden"  name="user" value="{{user.id}}">
+  <button>Search</button>
+</form>
+</div>
+{% else %}
+<div style="text-align:center;">
+<form id="form" action="{% url 'home' %}" method=GET>
+    {% csrf_token %}
+  <input type="search" id="query" name="q" placeholder="Search...">
+        <input type="hidden"  name="user" value="{{user.id}}">
+  <button>Search</button>
+
+</form>
+    </div>
+
+{% endif %}
+
+{% endblock %}
