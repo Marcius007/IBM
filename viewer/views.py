@@ -1,40 +1,42 @@
+from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.models import User
-from django.views.generic import ListView
+from django.views.generic import ListView, DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 
 from viewer.forms import RegisterForm, GifsSearch
-from viewer.models import UserGifs
+from viewer.models import UserGifs, GifLinks
 
 
 def gif_page(request):
-    obj = UserGifs.objects.order_by('-date_time')[:5]
-    if request.GET.get('q'):
+    obj = UserGifs.objects.order_by('-date_time')
+    context = [x for x in GifLinks.objects.filter(user_gif_id_id=obj.first().id)]
+    if request.POST.get('q'):
         import requests
-        q = request.GET.get('q')
-        user = request.GET.get('user')
-        form = UserGifs(search_text=q, user_id_id=user)
+        text = request.POST.get('q')
+        user = request.POST.get('user')
+        form = UserGifs(search_text=text, user_id_id=user)
         form.save()
-        q = nlu(q)
-        context = []
-        for i in q:
+        last_searched_text = UserGifs.objects.order_by('-id').first()
+        text_list_after_nlu = nlu(text)
+        for i in text_list_after_nlu:
             payload = {'api_key': 'bNkBDN7vEC0i6O6Wewbvveu77uxbI7KM', 'q': i, 'limit': '1', 'offset': '',
                        'rating': 'g',
                        'lang': 'en'}
             r = requests.get('https://api.giphy.com/v1/gifs/search', params=payload)
             if len(r.json()['data']) >= 1:
-                context.append(r.json()['data'][0]['images']['original'])
-        return render(request, 'GIF.html', {
-            'context': context,
-            'obj': obj
-        })
+                dict_with_url = r.json()['data'][0]['images']['original']['webp']
+                form = GifLinks(gif_address=dict_with_url, user_gif_id_id=last_searched_text.id, user_id_id=user)
+                form.save()
+        return HttpResponseRedirect('/gif/')
     return render(request, 'GIF.html', {
-        'obj': obj
+        'obj': obj[:5],
+        'context': context
     })
 
-#
+
 def nlu(text: str):
     import json
     from ibm_watson import NaturalLanguageUnderstandingV1
@@ -56,7 +58,7 @@ def nlu(text: str):
             entities=EntitiesOptions(emotion=True, sentiment=True, limit=6),
             keywords=KeywordsOptions(emotion=True, sentiment=True, limit=6))).get_result()
     res = json.loads(json.dumps(response, indent=2))
-    for e,i in res.items():
+    for e, i in res.items():
         if e == 'keywords':
             for x in res[e]:
                 nlu_text_str.append(x['text'])
@@ -112,3 +114,13 @@ class GifView(LoginRequiredMixin, ListView):
     model = User
     login_url = 'login/'
     template_name = 'authentication/login.html'
+
+
+class HistoryView(LoginRequiredMixin, DetailView):
+    model = GifLinks
+    template_name = 'GIF_history.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(HistoryView, self).get_context_data(**kwargs)
+        context['obj_list'] = GifLinks.objects.filter(user_gif_id_id=self.object.id)
+        return context

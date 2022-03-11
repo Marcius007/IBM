@@ -2,46 +2,58 @@
 {% block content %}
 {% include 'navbar.html' %}
 <center><h1> GIF</h1></center>
-<div style="margin: auto;">
-<div style="text-align: left;">
-<div>
-    <h1>History</h1>
-    {% for object in obj %}
-    <div class="row">
-    <p>{{object.date_time|date:"Y-d-m H:i"}} was looking at:  {{object.search_text}}</p> <br>
-        </div>
-    {% endfor %}
-</div>
+<div class="row">
+    <div class="col-2">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>History</th>
+                </tr>
+            </thead>
+            {% if obj %}
+                <tbody>
+                {% for object in obj %}
+                    <tr>
+                        <td>
+                            <a href="/gif_history/{{object.id}}" >{{object.date_time|date:"Y-d-m H:i"}} :  {{object.search_text}}</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            {% else %}
+                <tbody>
+                    <tr>
+                        <td><h5>No searches were made</h5></td>
+                    </tr>
+                </tbody>
+            {% endif %}
+        </table>
     </div>
+    {% if context %}
+    <div class="col-10" style="text-align:center;" >
+        {% for i in context %}
+            <img src="{{i.gif_address}}"  width="150" height="160">
+        {% endfor %}
+        <br>
+        <br>
+    <form id="form1" action="{% url 'home' %}" method=POST>
+        {% csrf_token %}
+            <input type="search" id="query1" name="q" placeholder="Search...">
+            <input type="hidden"  name="user" value="{{user.id}}">
+            <button>Search</button>
+    </form>
     </div>
-{% if context %}
-<div class="center" style="text-align:center;" >
-    {% for i in context %}
-<img src="{{i.webp}}"  width="150" height="160">
-
-{% endfor %}
-    <br>
-    <br>
-    </div>
-<div class="center2" style="text-align:center;" >
-    <form id="form1" action="{% url 'home' %}" method=GET>
-    {% csrf_token %}
-  <input type="search" id="query1" name="q" placeholder="Search...">
-        <input type="hidden"  name="user" value="{{user.id}}">
-  <button>Search</button>
-</form>
-</div>
 {% else %}
-<div style="text-align:center;">
-<form id="form" action="{% url 'home' %}" method=GET>
-    {% csrf_token %}
-  <input type="search" id="query" name="q" placeholder="Search...">
-        <input type="hidden"  name="user" value="{{user.id}}">
-  <button>Search</button>
+    <div class="col-10" style="text-align:center;">
+        <form id="form" action="{% url 'home' %}" method=POST>
+            {% csrf_token %}
+                <input type="search" id="query" name="q" placeholder="Search...">
+                <input type="hidden"  name="user" value="{{user.id}}">
+                <button>Search</button>
 
-</form>
+        </form>
     </div>
 
 {% endif %}
-
+</div>
 {% endblock %}

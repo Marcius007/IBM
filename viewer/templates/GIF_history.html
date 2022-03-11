@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block content %}
+{% include 'navbar.html' %}
+<center><h1>GIF SEARCH HISTORY</h1></center>
+<div>
+    <table>
+        <thead>
+            <tr>
+                <th>Search time</th>
+                <th>Search text</th>
+                <th>gifs</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>{{object.user_gif_id.date_time}}</td>
+                <td>{{object.user_gif_id.search_text}}</td>
+                <td><div>
+                    {% for i in obj_list %}
+                        <img src="{{i.gif_address}}"  width="150" height="160">
+                    {% endfor %}</div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+
+{% endblock %}
