@@ -13,8 +13,8 @@
         </thead>
         <tbody>
             <tr>
-                <td>{{object.user_gif_id.date_time}}</td>
-                <td>{{object.user_gif_id.search_text}}</td>
+                <td>{{object.date_time|date:"Y-d-m H:i"}}</td>
+                <td>{{object.search_text}}</td>
                 <td><div>
                     {% for i in obj_list %}
                         <img src="{{i.gif_address}}"  width="150" height="160">

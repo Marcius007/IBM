@@ -55,8 +55,8 @@ def nlu(text: str):
     response = natural_language_understanding.analyze(
         text=text, language='en',
         features=Features(
-            entities=EntitiesOptions(emotion=True, sentiment=True, limit=6),
-            keywords=KeywordsOptions(emotion=True, sentiment=True, limit=6))).get_result()
+            entities=EntitiesOptions(emotion=True, sentiment=True),
+            keywords=KeywordsOptions(emotion=True, sentiment=True))).get_result()
     res = json.loads(json.dumps(response, indent=2))
     for e, i in res.items():
         if e == 'keywords':
@@ -100,6 +100,7 @@ def log_out(request):
     logout(request)
     return redirect('login')
 
+
 def gif_search(request, pk):
     p = request.GET.get('q')
     form = UserGifs(search_text=p, user_id_id=pk)
@@ -117,7 +118,7 @@ class GifView(LoginRequiredMixin, ListView):
 
 
 class HistoryView(LoginRequiredMixin, DetailView):
-    model = GifLinks
+    model = UserGifs
     template_name = 'GIF_history.html'
 
     def get_context_data(self, **kwargs):

@@ -5,6 +5,7 @@ from django.forms import fields, ModelForm, models
 from django.core.exceptions import ValidationError
 from viewer.models import UserGifs
 
+
 class RegisterForm(UserCreationForm):
 
     class Meta:

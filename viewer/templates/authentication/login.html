@@ -1,7 +1,6 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1> login</h1>
 {% if messages %}
   {% for message in messages %}
     {{message}}
@@ -27,7 +26,7 @@
 
     <!-- Remind Passowrd -->
     <div id="formFooter">
-      <a class="underlineHover" href="{% url 'register' %}">Forgot Password?</a>
+      <a class="underlineHover" href="{% url 'register' %}">Register</a>
     </div>
 
   </div>
